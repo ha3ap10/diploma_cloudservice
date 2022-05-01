@@ -1,0 +1,18 @@
+FROM maven:3-adoptopenjdk-14 as Package
+
+COPY ./src/main ./diploma_cloudservice/src/main
+COPY pom.xml ./diploma_cloudservice
+
+WORKDIR /diploma_cloudservice
+
+RUN mvn clean package
+
+FROM adoptopenjdk/openjdk14:jre-14.0.2_12-alpine
+
+EXPOSE 8081
+
+COPY --from=Package /diploma_cloudservice/target/diploma_cloudservice-0.0.1-SNAPSHOT.jar /app/diploma_cloudservice.jar
+
+WORKDIR /app
+
+CMD ["java", "-jar", "diploma_cloudservice.jar"]

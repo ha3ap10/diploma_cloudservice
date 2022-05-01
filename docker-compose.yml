@@ -1,0 +1,41 @@
+version: '3.7'
+
+services:
+  db_mysql:
+    image: 'mysql'
+    build:
+      context: ./
+      dockerfile: dockerfile-mysql
+    ports:
+      - 3306:3306
+    container_name: db_mysql
+
+  cloudservice_front:
+    image: 'cloudservice_front'
+    build:
+      context: ./
+      dockerfile: dockerfile-front
+    ports:
+      - 8080:8080
+    container_name: cloudservice_front
+
+  cloudservice_back:
+    image: 'cloudservice_back:0.0.1'
+    build:
+      context: ./
+      dockerfile: dockerfile-back
+    ports:
+      - 8081:8081
+    depends_on:
+      - "db_mysql"
+    environment:
+        spring.datasource.url: "jdbc:mysql://db_mysql:3306/cloud?createDatabaseIfNotExist=true"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 15s
+        max_attempts: 5
+        window: 120s
+    volumes:
+      - /media:/app/media
+    container_name: cloudservice_back
