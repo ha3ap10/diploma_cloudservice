@@ -4,13 +4,19 @@
 
     <changeSet id="001" author="anazarenko">
         <createTable tableName="users">
-            <column name="login" type="varchar(50)">
+            <column name="login" type="varchar(45)">
                 <constraints nullable="false"/>
             </column>
-            <column name="password" type="varchar(50)">
+            <column name="password" type="varchar(64)">
                 <constraints nullable="false"/>
             </column>
             <column name="auth_token" type="varchar(50)"/>
+            <column name="role" type="varchar(45)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="tinyint(4)">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
         <addPrimaryKey columnNames="login"
                        tableName="users"/>

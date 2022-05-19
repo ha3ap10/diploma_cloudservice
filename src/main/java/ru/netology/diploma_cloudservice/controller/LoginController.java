@@ -11,7 +11,6 @@ import ru.netology.diploma_cloudservice.service.UserService;
 
 import javax.validation.Valid;
 
-//@CrossOrigin(origins = "http://localhost:8080")
 @CrossOrigin(originPatterns = "http://localhost*")
 @RestController
 public class LoginController {
@@ -22,18 +21,20 @@ public class LoginController {
         this.userService = userService;
     }
 
-//    @PreAuthorize("hasAnyAuthority('read')")
     @PostMapping("/login")
     public ResponseEntity<Token> login(@Valid @RequestBody RequestUser user) {
-        System.out.println("user: " + user);
         return new ResponseEntity<>(userService.login(user), HttpStatus.OK);
     }
 
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestHeader("auth-token") String authToken) {
-        System.out.println("LOGOUT");
-        return new ResponseEntity<>(userService.logout(authToken), HttpStatus.OK);
+    public ResponseEntity<String> logout(@RequestHeader("auth-token") Token authToken) {
+        return new ResponseEntity<>(userService.logout(updateToken(authToken)), HttpStatus.OK);
+    }
+
+    @GetMapping("/login")
+    public ResponseEntity<String> logoutGet(@RequestHeader("auth-token") Token authToken) {
+        return new ResponseEntity<>(userService.logout(updateToken(authToken)), HttpStatus.OK);
     }
 
     @ExceptionHandler(ErrorBadCredentials.class)
@@ -41,6 +42,13 @@ public class LoginController {
     ErrorMessage errorMessage(ErrorBadCredentials exception) {
         return new ErrorMessage(exception.getMessage(),
                 HttpStatus.BAD_REQUEST.value());
+    }
+
+    private Token updateToken(Token token) {
+        if (token.getToken().startsWith("Bearer ")) {
+            token.setToken(token.getToken().substring(7));
+        }
+        return token;
     }
 
 }

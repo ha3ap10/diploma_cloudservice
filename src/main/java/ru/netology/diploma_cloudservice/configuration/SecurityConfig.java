@@ -6,7 +6,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -15,7 +18,7 @@ import javax.sql.DataSource;
 import java.util.List;
 
 @Configuration
-//@EnableWebSecurity
+@EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true, jsr250Enabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -25,23 +28,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .cors().and().authorizeRequests()
+                .cors()
+                .and()
+                .authorizeRequests()
                 .antMatchers("/login").permitAll()
                 .anyRequest().permitAll()/*authenticated()*/;
     }
 
-//    @Bean
-//    public PasswordEncoder encoder() {
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
 //        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+//    @Bean
+//    public AuthenticationManager authenticationManagerBean() throws Exception {
+//        return super.authenticationManagerBean();
 //    }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication()
                 .dataSource(dataSource);
-//                .withDefaultSchema()
-//                .withUser("alexey").password(encoder().encode("qwe"))
-//                .roles("USER");
+//                .usersByUsernameQuery("SELECT login as USERNAME, password as PASSWORD, enabled " +
+//                        "FROM users where USERNAME = ?")
+//                .authoritiesByUsernameQuery("SELECT role as authority " +
+//                        "FROM users where USERNAME = ?");
     }
 
     @Bean

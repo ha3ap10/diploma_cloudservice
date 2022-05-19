@@ -1,5 +1,6 @@
 package ru.netology.diploma_cloudservice.controller;
 
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +13,7 @@ import ru.netology.diploma_cloudservice.service.FileService;
 
 import java.io.IOException;
 import java.util.List;
-
-import static ru.netology.diploma_cloudservice.constants.Constants.*;
+import java.util.Map;
 
 @CrossOrigin(originPatterns = "http://localhost*")
 @RestController("/cloud")
@@ -29,37 +29,34 @@ public class FileController {
     public ResponseEntity<String> uploadFile(@RequestHeader("auth-token") Token token,
                                              @RequestParam("filename") String fileName,
                                              @RequestBody MultipartFile file) throws IOException {
-        if (token.getToken().startsWith("Bearer ")) {
-            token.setToken(token.getToken().substring(7));
-        }
-        System.out.println(file.getSize());
-        return new ResponseEntity<>(fileService.uploadFile(token, fileName, file),HttpStatus.OK);
+        return new ResponseEntity<>(fileService.uploadFile(updateToken(token), fileName, file),HttpStatus.OK);
     }
 
     @DeleteMapping("/file")
     public String deleteFile(@RequestHeader("auth-token") Token token,
                              @RequestParam("filename") String fileName) {
-        return SUCCESS_DELETED.get();
+        return fileService.deleteFile(updateToken(token), fileName);
     }
 
     @GetMapping("/file")
-    public String downloadFile() {
-        return SUCCESS_DOWNLOAD.get();
+    public ResponseEntity<Resource> downloadFile(@RequestHeader("auth-token") Token token,
+                                                 @RequestParam("filename") String fileName) {
+
+        Resource resource = fileService.downloadFile(updateToken(token), fileName);
+        return new ResponseEntity<>(resource,HttpStatus.OK);
     }
 
     @PutMapping("/file")
-    public String editFile() {
-        return SUCCESS_UPLOAD.get();
+    public String editFile(@RequestHeader("auth-token") Token token,
+                           @RequestParam("filename") String fileName,
+                           @RequestBody Map<String, String> newFileName) {
+        return fileService.editFile(updateToken(token), fileName, newFileName);
     }
 
     @GetMapping("/list")
     public List<File> getFilesList(@RequestHeader("auth-token") Token token,
                                    @RequestParam("limit") Integer limit) {
-        System.out.println("FileController/list: " + token);
-        if (token.getToken().startsWith("Bearer ")) {
-            token.setToken(token.getToken().substring(7));
-        }
-        return fileService.getFilesList(token, limit);
+        return fileService.getFilesList(updateToken(token), limit);
     }
 
     @ExceptionHandler(ErrorBadCredentials.class)
@@ -67,5 +64,12 @@ public class FileController {
     ErrorMessage errorMessage(ErrorBadCredentials exception) {
         return new ErrorMessage(exception.getMessage(),
                 HttpStatus.BAD_REQUEST.value());
+    }
+
+    private Token updateToken(Token token) {
+        if (token.getToken().startsWith("Bearer ")) {
+            token.setToken(token.getToken().substring(7));
+        }
+        return token;
     }
 }

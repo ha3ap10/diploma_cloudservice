@@ -1,7 +1,5 @@
 FROM mysql
 
-VOLUME /mysql var/lib/mysql
-
 ENV MYSQL_ROOT_PASSWORD "mysql"
 
 EXPOSE 3306

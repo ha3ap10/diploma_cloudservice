@@ -1,7 +1,8 @@
-insert into cloud.users (login, password, auth_token)
-values ('alexey', 'qwe', 89260008899),
-       ('Vasya', 'qwe', 89095653214),
-       ('Ivan', 'qwe', 89095653225),
-       ('Petya', 'qwe', 89095653247),
-       ('Masha', 'qwe', 89095653269),
-       ('Sveta', 'qwe', 89095653236);
+insert into cloud.users (login, password, role, enabled)
+values ('alexey', 'qwe','ROLE_USER', 1),
+       ('qwe', 'qwe', 'ROLE_USER', 1),
+       ('Vasya', 'qwe', 'ROLE_USER', 1),
+       ('Ivan', 'qwe', 'ROLE_USER', 1),
+       ('Petya', 'qwe', 'ROLE_USER', 1),
+       ('Masha', 'qwe', 'ROLE_USER', 1),
+       ('Sveta', 'qwe', 'ROLE_USER', 1);

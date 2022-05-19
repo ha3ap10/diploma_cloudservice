@@ -1,6 +1,5 @@
 package ru.netology.diploma_cloudservice.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

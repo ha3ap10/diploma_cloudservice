@@ -8,6 +8,8 @@ services:
       dockerfile: dockerfile-mysql
     ports:
       - 3306:3306
+    volumes:
+      - ./mysql:/var/lib/mysql
     container_name: db_mysql
 
   cloudservice_front:
@@ -37,5 +39,5 @@ services:
         max_attempts: 5
         window: 120s
     volumes:
-      - /media:/app/media
+      - ./media:/app/media
     container_name: cloudservice_back
