@@ -1,35 +1,31 @@
 package ru.netology.diploma_cloudservice.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import ru.netology.diploma_cloudservice.exceptions.ErrorBadCredentials;
 import ru.netology.diploma_cloudservice.exceptions.UnauthorizedError;
-import ru.netology.diploma_cloudservice.model.RequestUser;
 import ru.netology.diploma_cloudservice.model.Token;
 import ru.netology.diploma_cloudservice.model.User;
 import ru.netology.diploma_cloudservice.repositiry.JpaUserRepository;
 
-import java.util.UUID;
-
-import static ru.netology.diploma_cloudservice.constants.Constants.SUCCESS_LOGOUT;
-import static ru.netology.diploma_cloudservice.constants.Constants.UNAUTHORIZED_ERROR;
+import static ru.netology.diploma_cloudservice.constants.Constants.*;
 
 @Service
-public class UserService {
+public class JwtUserDetailService implements UserDetailsService {
 
+    @Autowired
     private JpaUserRepository jpaUserRepository;
 
-    public UserService(JpaUserRepository jpaUserRepository) {
-        this.jpaUserRepository = jpaUserRepository;
+    @Override
+    public UserDetails loadUserByUsername(String username){
+        return jpaUserRepository.findByUsername(username)
+                .orElseThrow(() -> new ErrorBadCredentials(USER_NOT_FOUND.get()));
     }
 
-    public Token login(RequestUser user) {
-        User findUser = jpaUserRepository.findByLogin(user.getLogin())
-                .orElseThrow(() -> new ErrorBadCredentials("Не найден"));
-
-        Token token = new Token(UUID.randomUUID().toString());
-        findUser.setAuthToken(token);
-        jpaUserRepository.save(findUser);
-        return token;
+    public void saveUser(User user) {
+        jpaUserRepository.save(user);
     }
 
     public String logout(Token authToken) {

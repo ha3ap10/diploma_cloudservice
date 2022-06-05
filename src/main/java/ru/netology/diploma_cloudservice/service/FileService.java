@@ -25,9 +25,9 @@ import static ru.netology.diploma_cloudservice.constants.Constants.*;
 @Service
 public class FileService {
 
-    private FileRepository fileRepository;
-    private JpaFileRepository jpaFileRepository;
-    private JpaUserRepository jpaUserRepository;
+    private final FileRepository fileRepository;
+    private final JpaFileRepository jpaFileRepository;
+    private final JpaUserRepository jpaUserRepository;
 
     public FileService(FileRepository fileRepository, JpaFileRepository jpaFileRepository, JpaUserRepository jpaUserRepository) {
         this.fileRepository = fileRepository;
@@ -39,7 +39,7 @@ public class FileService {
 
         User user = findUser(token);
 
-        if (jpaFileRepository.findByFile_FileNameAndLogin(fileName, user.getLogin()).isEmpty()) {
+        if (jpaFileRepository.findByFile_FileNameAndUsername(fileName, user.getUsername()).isEmpty()) {
             Date date = new Date();
             String guid = UUID.nameUUIDFromBytes(file.getBytes()).toString();
             File fileInfo = new File(fileName, file.getSize());
@@ -47,7 +47,7 @@ public class FileService {
             Files uploadedFile = new Files();
             uploadedFile.setDate(date);
             uploadedFile.setGuid(guid);
-            uploadedFile.setLogin(user.getLogin());
+            uploadedFile.setUsername(user.getUsername());
             uploadedFile.setFile(fileInfo);
 
             jpaFileRepository.save(uploadedFile);
@@ -60,11 +60,11 @@ public class FileService {
     }
 
     public List<File> getFilesList(Token token, Integer limit) {
-        return jpaFileRepository.findFileByLogin(findUser(token).getLogin());
+        return jpaFileRepository.findFileByUsername(findUser(token).getUsername());
     }
 
     public String deleteFile(Token token, String fileName) {
-        Files searched = jpaFileRepository.findByFile_FileNameAndLogin(fileName, findUser(token).getLogin())
+        Files searched = jpaFileRepository.findByFile_FileNameAndUsername(fileName, findUser(token).getUsername())
                 .orElseThrow(() -> new ErrorInputData(ERROR_INPUT_DATA.get()));
 
         if (fileRepository.deleteFile(searched.getGuid())) {
@@ -77,7 +77,7 @@ public class FileService {
 
     public Resource downloadFile(Token token, String fileName) {
         Files removableFile = jpaFileRepository
-                .findByFile_FileNameAndLogin(fileName, findUser(token).getLogin())
+                .findByFile_FileNameAndUsername(fileName, findUser(token).getUsername())
                 .orElseThrow(() -> new ErrorInputData(ERROR_INPUT_DATA.get()));
         return fileRepository.downloadFile(removableFile.getGuid());
     }
@@ -89,9 +89,9 @@ public class FileService {
 
     public String editFile(Token token, String fileName, Map<String, String> newFileName) {
         Files editableFile = jpaFileRepository
-                .findByFile_FileNameAndLogin(fileName, findUser(token).getLogin())
+                .findByFile_FileNameAndUsername(fileName, findUser(token).getUsername())
                 .orElseThrow(() -> new ErrorInputData(ERROR_INPUT_DATA.get()));
-        jpaFileRepository.editFile(newFileName.get("filename"), editableFile.getId());
+        jpaFileRepository.editFile(newFileName.get(FILENAME.get()), editableFile.getId());
         return SUCCESS_EDIT.get();
     }
 }

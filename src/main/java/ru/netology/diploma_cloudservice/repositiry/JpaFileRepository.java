@@ -15,10 +15,10 @@ import java.util.Optional;
 @Repository
 public interface JpaFileRepository extends JpaRepository<Files, Long> {
 
-    @Query("select f.file from Files f where f.login = ?1")
-    List<File> findFileByLogin(String login);
+    @Query("select f.file from Files f where f.username = ?1")
+    List<File> findFileByUsername(String username);
 
-    Optional<Files> findByFile_FileNameAndLogin(String fileName, String login);
+    Optional<Files> findByFile_FileNameAndUsername(String fileName, String username);
 
     @Modifying
     @Query("update Files f set f.file.fileName = ?1 where f.id = ?2")

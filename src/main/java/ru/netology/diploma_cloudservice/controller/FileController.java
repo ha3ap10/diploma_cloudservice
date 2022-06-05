@@ -17,7 +17,7 @@ import java.util.Map;
 
 @CrossOrigin(originPatterns = "http://localhost*")
 @RestController("/cloud")
-public class FileController {
+public class FileController extends CommonControllerUtil {
 
     private FileService fileService;
 
@@ -64,12 +64,5 @@ public class FileController {
     ErrorMessage errorMessage(ErrorBadCredentials exception) {
         return new ErrorMessage(exception.getMessage(),
                 HttpStatus.BAD_REQUEST.value());
-    }
-
-    private Token updateToken(Token token) {
-        if (token.getToken().startsWith("Bearer ")) {
-            token.setToken(token.getToken().substring(7));
-        }
-        return token;
     }
 }

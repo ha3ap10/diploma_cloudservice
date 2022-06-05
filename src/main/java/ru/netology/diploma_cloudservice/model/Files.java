@@ -20,7 +20,7 @@ public class Files {
     private Long id;
 
     @Column
-    private String login;
+    private String username;
 
     @Embedded
     private File file;

@@ -16,7 +16,11 @@ public enum Constants {
     SUCCESS_GET_LIST("Success get list"),
     SUCCESS_LOGOUT("Success logout"),
     SUCCESS_UPLOAD("Success upload"),
-    UNAUTHORIZED_ERROR("Unauthorized error");
+    TOKEN_START("Bearer "),
+    UNAUTHORIZED_ERROR("Unauthorized error"),
+    USER_LOGIN("User %s login"),
+    USER_LOGOUT("User %s logout"),
+    USER_NOT_FOUND("User not found");
 
     private String title;
 
